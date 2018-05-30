@@ -7,12 +7,6 @@
 #include <math.h>
 #include "CliqueCount.c"
 
-/*
-*	(1)
-*	(2)
-*	(3)
-*/
-
 class RGraph {
 public:
 	void initialize(int r_num) {
@@ -92,7 +86,7 @@ public:
 		double d = initial_d;
 		//double d = 500;
 		//.75 is pretty good double q = .75;
-		double q = .8;
+		double q = .975;
 		
 		printf("Beginning initial CliqueCount...\n");
 		int cliqueCount = CliqueCount(this->adj_graph, this->r_num);
