@@ -22,7 +22,8 @@ public:
 		
 		this->r_num = r_num;
 		this->adj_graph = new int[r_num*r_num];
-		
+		this->local_min_intensity = 0;
+
 		int g_size = 0;
 		for (int i = 0; i < r_num; ++i)
 			g_size += i;
@@ -138,6 +139,8 @@ public:
 					local_min_count += 1;
 					if (search_space_b > (this->g_size-1))
 						search_space_b = rand() % (this->g_size-1);
+					if (local_min_count > 15)
+						cliqueCount = leave_local_minima(cliqueCount);	
 				}
 				printf("CliqueCount did not improve, still %i, d is now %f. Current Ramsey Number: %i\n", cliqueCount, d, this->r_num);
 			}
@@ -160,7 +163,8 @@ public:
 
 	void next_number() {
 		this->r_num += 1;
-		
+		this->local_min_intensity = 0;
+
 		printf("===================================\n");
 		printf("Moving on to Ramsey Number: %i.\n", this->r_num);
 		printf("===================================\n");
@@ -193,6 +197,18 @@ public:
 		this->adj_graph = new_adj_graph;
 		// Figure out good uphill searchspace this->luus_jaakola(0, this->r_num-1);
 		this->luus_jaakola(0, this->r_num-1);
+	}
+
+	int leave_local_minima(int currentCliqueCount) {
+		local_min_intensity += 1;
+		bool found_close_graph = false;
+
+		for (int i = 0; i < 100*local_min_intensity; ++i) {
+			int edge = rand() % this->g_size;
+			(this->graph)[edge] = ((this->graph)[edge] + 1) % 2;
+			(this->adj_graph)[index_from_triangle(edge)] = ((this->adj_graph)[index_from_triangle(edge)] + 1) % 2;
+		}
+		return (CliqueCount(this->graph, this->r_num));
 	}
 
 	void print_graph() {
@@ -246,6 +262,7 @@ private:
 	int *graph;
 	int g_size;
 	short *encoded_graph;
+	int local_min_intensity;
 	int eg_size;	
 	int r_num;
 };
