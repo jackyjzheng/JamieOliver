@@ -133,10 +133,13 @@ public:
 					local_min_count += 1;
 					if (search_space_b > (this->g_size-1))
 						search_space_b = rand() % (this->g_size-1);
-					if (local_min_count > 15)
-						cliqueCount = leave_local_minima(cliqueCount);	
+					if (local_min_count > 15) {
+						printf("Attempting to leave local min. Local min intensity: %i\n", this->local_min_intensity);
+						cliqueCount = leave_local_minima(cliqueCount);
+						flip_back = false;	
+					}
 				}
-				printf("CliqueCount did not improve, still %i, d is now %f. Current Ramsey Number: %i\n", cliqueCount, d, this->r_num);
+				printf("CliqueCount did not improve, still %i, d is now %f. Current Ramsey Number: %i. Local min. counter: %i\n", cliqueCount, d, this->r_num, local_min_count);
 			}
 
 			while (!edges_flipped.empty()) {
@@ -197,12 +200,20 @@ public:
 		local_min_intensity += 1;
 		bool found_close_graph = false;
 
-		for (int i = 0; i < 100*local_min_intensity; ++i) {
+		printf("Randomly modifying edges.\n");
+		int edges_to_change = 100*local_min_intensity;
+		if (edges_to_change > this->g_size)
+		{
+			edges_to_change = (this->g_size)/2;
+			local_min_intensity = 0;
+		}
+		for (int i = 0; i < edges_to_change; ++i) {
 			int edge = rand() % this->g_size;
 			(this->graph)[edge] = ((this->graph)[edge] + 1) % 2;
 			(this->adj_graph)[index_from_triangle(edge)] = ((this->adj_graph)[index_from_triangle(edge)] + 1) % 2;
 		}
-		return (CliqueCount(this->graph, this->r_num));
+		printf("Finished modifying edges.\n");
+		return (CliqueCount(this->adj_graph, this->r_num));
 	}
 
 	void print_graph() {
