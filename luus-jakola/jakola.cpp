@@ -7,14 +7,19 @@
 #include <math.h>
 #include "CliqueCount.c"
 
+/*
+* Since I'm literally too lazy to write a two-line makefile:
+*	compile with g++ -std=c++11 -o jakola jakola.cpp
+*/
+
 class RGraph {
 public:
 	/* Initialization:
-	*	r_num=
-	*	graph=
-	*	g_size=
-	*	adj_graph=
-	*	local_min_intensity=
+	*	r_num=current ramsey number
+	*	graph=int* array encoding upper right hand triangle of adj_matrix, these are the edges we flip
+	*	g_size=number of elements in graph, is equal to sum(1->r_num-1)
+	*	adj_graph=int* array encoding entire adjacency matrix for CliqueCount
+	*	local_min_intensity=variable counting how long we've stayed at the same number. Used to try and climb out of local minimum
 	*/
 	void initialize(int r_num) {
 		printf("===================================\n");
