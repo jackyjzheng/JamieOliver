@@ -86,7 +86,7 @@ public:
 		double d = initial_d;
 		//double d = 500;
 		//.75 is pretty good double q = .75;
-		double q = .975;
+		double q = .985;
 		
 		printf("Beginning initial CliqueCount...\n");
 		int cliqueCount = CliqueCount(this->adj_graph, this->r_num);
@@ -158,7 +158,7 @@ public:
 		printf("\n");
 	}
 
-	void next_number() {
+	void next_number(int jump_number) {
 		this->r_num += 1;
 		this->local_min_intensity = 0;
 
@@ -192,7 +192,14 @@ public:
 		delete[] this->adj_graph;
 		this->graph = new_graph;
 		this->adj_graph = new_adj_graph;
-		// Figure out good uphill searchspace this->luus_jaakola(0, this->r_num-1);
+		
+		// only working for jump 2
+		jump_number -= 1;
+		if (jump_number != 0)
+			(this->next_number)(1);
+		else
+			return;
+		
 		this->luus_jaakola(0, this->r_num-1);
 	}
 
@@ -201,7 +208,7 @@ public:
 		bool found_close_graph = false;
 
 		printf("Randomly modifying edges.\n");
-		int edges_to_change = 100*local_min_intensity;
+		int edges_to_change = 2*local_min_intensity;
 		if (edges_to_change > this->g_size)
 		{
 			edges_to_change = (this->g_size)/2;
@@ -282,7 +289,7 @@ int main(int argc, char **argv) {
 	RGraph test = RGraph(r_num);
 	test.luus_jaakola();
 	while (true) {
-		test.next_number();
+		test.next_number(2);
 	}
 	//test.encode_graph();
 	//int output = test.write_encoded_graph("r.dat");
