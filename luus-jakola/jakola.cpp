@@ -9,6 +9,13 @@
 
 class RGraph {
 public:
+	/* Initialization:
+	*	r_num=
+	*	graph=
+	*	g_size=
+	*	adj_graph=
+	*	local_min_intensity=
+	*/
 	void initialize(int r_num) {
 		printf("===================================\n");
 		printf("Initialize with Ramsey Number: %i.\n", r_num);
@@ -35,6 +42,12 @@ public:
 		}
 	}
 
+	/*
+	* Converts index from *graph to index of *adj_graph
+	* --> *graph only encodes upper right triangle which are the only edges we want to flip,
+	*		but CliqueCount needs to take in the whole matrix.
+	*		So everytime we flip (this->graph)[i] we also flip (this->adj_graph)[index_from_triangle(i)]
+	*/
 	int index_from_triangle(int triangle_index) {
 		int row = 1;
 		
@@ -63,6 +76,9 @@ public:
 		delete[] adj_graph;
 	}
 
+	/*
+	*	Calculates number of edges that are of different color than (this->graph)[index1] from index1 to index2
+	*/
 	int distance(int index1, int index2) {
 		int counter = 0;
 		int initial_color = (this->graph)[index1];
@@ -74,6 +90,18 @@ public:
 		return counter;
 	}
 
+	/*
+	*	http://ijmcs.future-in-tech.net/10.1/R-MangeDunn.pdf
+	*	Edge flipping algorithm: search_space_a and search_space_b are indices where we will flip edge.
+	*	--> Paper says important parameters are d,q where for R(5,5) q~=.9975 optimal and d~=3 optimal
+	*			From what I'm seeing these values are kinda useless, going to write test program to attempt to find optimal values.
+	*		d is a double where round(d) is how many edges we are going to flip
+	*		q is the shrinking parameter. If CliqueCount does not go down d = d*q. If round(d) == 0, we pick new random d
+	*	Right now we use color distance to calculate d, no real reason just seems to give a good value I think.
+	*	
+	*	std::queue<int> edges_flipped so store edges we flip in case we need to flip them back
+	*	std::unordered_map<int, bool> already_flipped to remember if we've already flipped this turn. Need to fix after some bs. I did.
+	*/
 	void luus_jaakola(int search_space_a=0, int search_space_b=-1) {
 		if (search_space_b == -1) {
 			search_space_b = this->g_size-1;
@@ -101,7 +129,7 @@ public:
 			bool flip_back = false;
 			for (int i = 0; i < a; ++i) {
 				int flip = (rand() % (search_space_b+1)) + search_space_a;
-				//while (already_flipped[flip] == true) {
+				//while (already_flipped[flip] == true) { <-- Need to fix
 				//	flip = (rand() % (search_space_b+1)) + search_space_a;
 				//}
 				
@@ -158,6 +186,15 @@ public:
 		printf("\n");
 	}
 
+	/*
+	*	Function to move on to next ramsey number. Can currently jump either 1 or 2.
+	*	Most of this is basically copying old_adj_matrix and old_graph to new_adj_matrix and new_graph	
+	* 	For example: (moving up by 1)
+	*	xxx	  					                    	
+	*	xab = new_adj_graph		ab = old_adj_graph   xxxabd = new_graph   abd = old_graph 
+	*	xcd						cd
+	*	--> Once new graphs are set, Luus-Jaakola algorithm is called again to find 0 clique of new graph.
+	*/
 	void next_number(int jump_number) {
 		this->r_num += 1;
 		this->local_min_intensity = 0;
@@ -203,6 +240,13 @@ public:
 		this->luus_jaakola(0, this->r_num-1);
 	}
 
+	/*
+	*	Function to try and leave local minimum. Not the best at the moment but w/e.
+	*	Luus-Jaakola algorithm will only flip edges if the CliqueCount goes down. If CliqueCount is very small and we are at a local min, edges will never flip.
+	*	Therefore once condition is met, this function is called and some number of edges are flipped regardless of CliqueCount going up or down.
+	*	If we are stuck at the same ramsey_number for a long time --> local_min_intensity goes up and more edges flipped.
+	*/
+
 	int leave_local_minima(int currentCliqueCount) {
 		local_min_intensity += 1;
 		bool found_close_graph = false;
@@ -223,6 +267,7 @@ public:
 		return (CliqueCount(this->adj_graph, this->r_num));
 	}
 
+
 	void print_graph() {
 		//printf("PRINTING GRAPH...");
 		for (int i = 0; i < r_num * r_num; ++i) {
@@ -231,7 +276,10 @@ public:
 		printf("\n");
 	}
 
-
+	/*
+	* WIP
+	*
+	*/
 	void encode_graph() {
 		this->encoded_graph = new short[this->g_size];
 		int counter = 0;	
@@ -249,6 +297,9 @@ public:
 		return;
 	}
 
+	/*
+	*	Write out adjacency matrix into file
+	*/
 	void write_graph(const char *file_name) {
 		std::ofstream outFile(file_name);
 		int adj_size = this->r_num * this->r_num;
