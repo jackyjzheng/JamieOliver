@@ -12,7 +12,7 @@
 * Since I'm literally too lazy to write a two-line makefile:
 *	compile with g++ -std=c++11 -o jakola jakola.cpp
 */
-class RGraph {
+class RGraphGenerator {
 public:
 	/* Initialization:
 	*	r_num=current ramsey number
@@ -28,7 +28,6 @@ public:
 		
 		this->r_num = r_num;
 		this->adj_graph = new int[r_num*r_num];
-		this->local_min_intensity = 0;
 
 		int g_size = 0;
 		for (int i = 0; i < r_num; ++i)
@@ -118,39 +117,36 @@ public:
 	*	std::queue<int> edges_flipped so store edges we flip in case we need to flip them back
 	*	std::unordered_map<int, bool> already_flipped to remember if we've already flipped this turn. Need to fix after some bs. I did.
 	*/
-	int luus_jaakola(int search_space_a=0, int search_space_b=-1, int cycle_limit=-1, std::string file_name_test="") {
+	int luus_jaakola(int search_space_start=0, int search_space_end=-1, int cycle_limit=-1, std::string file_name_test="") {
 		int cycles = 0;
 
-		if (search_space_b == -1 || search_space_b > (this->g_size - 1)) {
-			search_space_b = this->g_size-1;
+		if (search_space_end == -1 || search_space_end > this->g_size-1) {
+			search_space_end = this->g_size-1;
 		}
-		printf("Initializing Luus-Jaakola with search space between indices %i and %i.\n", search_space_a, search_space_b);
+		printf("Initializing Luus-Jaakola with search space between indices %i and %i.\n", search_space_start, search_space_start+search_space_size-1);
 
 		int x = rand() % this->g_size;
-		int initial_d = distance(0, this->g_size) % (search_space_b+1);
+		
+		// Look into these parameters
+		int initial_d = distance(0, this->g_size) % (search_space_end+1);
 		double d = initial_d;
-		double q = .97;
+		double q = .925;
 		printf("Distance calculated is %i.\n", initial_d);
 		
 		printf("Beginning initial CliqueCount...\n");
 		int cliqueCount = CliqueCount(this->adj_graph, this->r_num);
 		
 		printf("Initial CliqueCount = %i\n", cliqueCount);
-		int local_min_count = 0;
 		while (cliqueCount != 0) {
-			int a = (rand() % (int) (round(d))) + 1;
+			int a = (rand()) % (((int) round(d)) + 1);
 			//int y = a + x;
 
 			// Temporarily not caring if we re-flip the edge
 			std::queue<int> edges_flipped;
-			//std::unordered_map<int, bool> flipped_this_turn;
 			bool flip_back = false;
 			for (int i = 0; i < a; ++i) {
-				int flip = (rand() % (search_space_b+1)) + search_space_a;
-				//while(flipped_this_turn[flip] == true)
-				//	flip = (rand() % (search_space_b+1)) + search_space_a;
+				int flip =  (rand() + search_space_start) % search_space_end;
 				edges_flipped.push(flip);
-				//flipped_this_turn[flip] = true;
 				
 				(this->graph)[flip] = (this->graph[flip] + 1) % 2;
 				int adj_index = index_from_triangle(flip);
@@ -163,7 +159,6 @@ public:
 					printf("CliqueCount stayed the same, but edges flipped. Current Ramsey Number: %i. Current Cycle: %i\n", this->r_num, cycles);
 				} else {
 					cliqueCount = newCliqueCount;
-					local_min_count = 0;
 					printf("CliqueCount improved, now %i. Current Ramsey Number: %i. Current Cycle: %i\n", cliqueCount, this->r_num, cycles);
 				}
 			} else {
@@ -173,13 +168,7 @@ public:
 					initial_d = distance(0, this->g_size) % (search_space_b-1);
 					d = initial_d;
 					search_space_b = rand() % (this->g_size-1);
-					local_min_count += 1;
-					if (local_min_count > 50) {
-						cliqueCount = leave_local_minima(cliqueCount);
-						flip_back = false;
-					}
 					//x = rand() % this->g_size;
-					printf("Attempting to leave local min. Local min intensity: %i\n", this->local_min_intensity);
 				}	
 				printf("CliqueCount did not improve, still %i, d is now %f. Current Ramsey Number: %i. Local min. counter: %i. Current Cycle: %i\n", cliqueCount, d, this->r_num, local_min_count, cycles);
 			}
@@ -189,13 +178,12 @@ public:
 				if (flip_back)
 				{	
 					(this->graph)[top] = ((this->graph)[top] + 1) % 2;
-					//flipped_this_turn[top] = false;
 				}
 				edges_flipped.pop();
 			}
-			//cycles += 1;
-			//if (cycle_limit != -1 && cycles >= cycle_limit)
-			//	return -1;
+			cycles += 1;
+			if (cycle_limit != -1 && cycles >= cycle_limit)
+				return -1;
 		}
 		
 		printf("CliqueCount reached 0, outputing to file.\n");
@@ -254,34 +242,6 @@ public:
 		}
 	}
 
-	/*
-	*	Function to try and leave local minimum. Not the best at the moment but w/e.
-	*	Luus-Jaakola algorithm will only flip edges if the CliqueCount goes down. If CliqueCount is very small and we are at a local min, edges will never flip.
-	*	Therefore once condition is met, this function is called and some number of edges are flipped regardless of CliqueCount going up or down.
-	*	If we are stuck at the same ramsey_number for a long time --> local_min_intensity goes up and more edges flipped.
-	*/
-
-	int leave_local_minima(int currentCliqueCount) {
-		local_min_intensity += 1;
-		bool found_close_graph = false;
-
-		printf("Randomly modifying edges.\n");
-		
-		int edges_to_change = local_min_intensity;
-		if (edges_to_change > this->g_size)
-		{
-			edges_to_change = (this->g_size)/2;
-			local_min_intensity = 0;
-		}
-		for (int i = 0; i < edges_to_change; ++i) {
-			int edge = rand() % this->g_size;
-			(this->graph)[edge] = ((this->graph)[edge] + 1) % 2;
-			(this->adj_graph)[index_from_triangle(edge)] = ((this->adj_graph)[index_from_triangle(edge)] + 1) % 2;
-		}
-		printf("Finished modifying edges.\n");
-		return (CliqueCount(this->adj_graph, this->r_num));
-	}
-	
 	void print_graph() {
 		for (int i = 0; i < r_num * r_num; ++i) {
 			printf("%i", this->adj_graph[i]);
@@ -304,23 +264,8 @@ public:
 				outFile << (this->graph)[i];
 		}
 	}
-
-	int rate_parameters(int fixed_r_num, int iterations) {
-		int counter = 0;
-		
-		bool stop = false;
-		while (!stop) {
-			this->reinitialize(fixed_r_num);
-			int cycles = this->luus_jaakola();
-			printf("Finished (Ramsey Number: %i) in (%i cycles).\n", this->r_num, cycles);
-			counter += 1;
-			if (counter == iterations)
-				stop = true;
-		}
-		return 1;
-	}
-
-	int rate_graph_freshness(int start_r_num) {
+	
+	int rate_graph_freshness(int start_r_num, int iterations) {
 		this->reinitialize(start_r_num);
 		int *graph_seed = new int[this->g_size];
 		for (int i = 0; i < this->g_size; ++i)
@@ -353,9 +298,6 @@ private:
 	int *adj_graph;
 	int *graph;
 	int g_size;
-	short *encoded_graph;
-	int local_min_intensity;
-	int eg_size;	
 	int r_num;
 };
 
@@ -373,6 +315,6 @@ int main(int argc, char **argv) {
 	//}
 	//test.luus_jaakola();
 	while (true) {
-		test.increment_and_run(1);
+		test.increment_and_run(3);
 	}
 }
