@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include "CliqueCount.c"
 
+// Compile with g++ -std=c++11 -o cyclic cyclic.cpp
 struct TabuList {
 	TabuList(int maxTabuSize)
 	{
@@ -38,6 +39,7 @@ struct TabuList {
 class RGraph {
 	/*
 	*	Ramsey graph that utilizes Tabu search on cyclic graphs as search algorithm.
+	*	-->	Since graphs are cyclic, CliqueCount only runs outerloop once, since every other 10 clique is symmetric.
 	*	-->	graph: Upper right hand triangle of adjacency matrix.
 	*		adjGraph: Adjacency matrix, diagonals and lower right are all 0s.
 	*		colors:	n/2 colors that defines the graph. Basically color[0] = every edge where vertices are 1 apart, color[2] = every edge where vertices are 2 apart etc..
@@ -390,4 +392,36 @@ int* read_color_graph(const char *file_name) {
 		}
 		printf("\n");
 		return color_graph;
+}
+
+int main(int argc, char **argv) {
+	if (argc != 3) {
+		printf("./cyclic ramsey_number tabu_size\n");
+		return 0;
+	}
+	
+	int rNum = atoi(argv[1]);
+	int tabuSize = atoi(argv[2]);
+	
+	while (true) {
+		RGraph *rGraph = new RGraph(rNum, tabuSize);
+		rGraph->tabu_search();
+	}
+
+
+	/* For incrementing from known graph
+	int *colors = read_adj_graph("329.txt");
+	RGraph *rGraph = new RGraph(rNum, tabuSize, colors);
+	while (true) {
+		rGraph->incrementNumber(2);
+		rGraph->tabu_search();
+	}*/
+	/*int numThreads = 4;
+	std::vector<std::thread> thread_pool;
+	thread_pool.reserve(numThreads);
+	for (int i = 0; i < numThreads; ++i) {
+		thread_pool.push_back(std::thread(tabu_loop_thread, rNum, tabuSize));
+	}*/
+	
+	return 0;
 }

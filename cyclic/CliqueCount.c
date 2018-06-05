@@ -1,4 +1,5 @@
 // sgsize must be >= 5 && <= 10
+// Only run outerloop once since we have a cyclic graph. Can always check results with CliqueCountOG
 int CliqueCount(int *g, int gsize)
 {
     int i;
