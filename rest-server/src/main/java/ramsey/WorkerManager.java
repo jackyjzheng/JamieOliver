@@ -162,7 +162,8 @@ public class WorkerManager {
       for (Worker worker : counterExampleWorkers) {
         int newNum = Integer.parseInt(prefix);
         newNum += 2;
-        sendMessage(worker, "NEW" + Integer.toString(newNum) + ", " + Integer.toString(newNum/10));
+        //sendMessage(worker, "NEW" + Integer.toString(newNum) + ", " + Integer.toString(newNum/10));
+        sendMessage(worker, "NEW300, 30");
       }
     }
   }
@@ -179,7 +180,7 @@ public class WorkerManager {
    */
   public void sendMessage(Worker worker, String message) {
     try {
-      System.out.println("Sending message to " + worker.getIp());
+      System.out.println("Sending message to " + worker.getIp() + " with message " + message);
       Socket socket = new Socket(worker.getIp(), worker.getPort());
       DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 
