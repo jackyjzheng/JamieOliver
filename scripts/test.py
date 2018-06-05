@@ -1,9 +1,8 @@
-import boto3
-
-ec2 = boto3.resource('ec2', region_name="us-east-1")
-
-instance = ec2.create_instances(
-    ImageId='ami-0df45c7a1da7d88a8',
-    MinCount=1,
-    MaxCount=1,
-    InstanceType='t2.micro')
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+try:
+    s.connect(('ubuntu@ec2-54-89-221-31.compute-1.amazonaws.com', 22))
+    print "Port 22 reachable"
+except socket.error as e:
+    print "Error on connect: %s" % e
+s.close()
