@@ -157,6 +157,7 @@ public class WorkerManager {
     String prefix = graphKey.split("/")[0];
     // Check if enough counter examples for that subdirectory to move workers
     if (s3Manager.getSubdirectorySize(prefix) > COUNTER_EXAMPLE_THRESHOLD) {
+      System.out.println("REACHED THE THRESHOLD");
       for (Worker worker : counterExampleWorkers) {
         int newNum = Integer.parseInt(prefix);
         newNum += 2;
@@ -177,6 +178,7 @@ public class WorkerManager {
    */
   public void sendMessage(Worker worker, String message) {
     try {
+      System.out.println("Sending message to " + worker.getIp());
       Socket socket = new Socket(worker.getIp(), worker.getPort());
       DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 
