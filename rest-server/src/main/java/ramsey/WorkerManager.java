@@ -30,64 +30,64 @@ public class WorkerManager {
 
   private void initializeWorkersList(int ramseyNum) {
     counterExampleWorkers.add(Worker.builder()
-            .ip("54.174.198.245")
-            .port(9090)
-            .ramseyNum(325)
-            .build());
-
-//    counterExampleWorkers.add(Worker.builder()
-//            .ip("")
-//            .port(9090)
-//            .ramseyNum(325)
-//            .build());
-//
-//    counterExampleWorkers.add(Worker.builder()
-//            .ip("")
-//            .port(9090)
-//            .ramseyNum(325)
-//            .build());
-//
-//    counterExampleWorkers.add(Worker.builder()
-//            .ip("")
-//            .port(9090)
-//            .ramseyNum(325)
-//            .build());
-//
-//    counterExampleWorkers.add(Worker.builder()
-//            .ip("")
-//            .port(9090)
-//            .ramseyNum(325)
-//            .build());
-//
-//    counterExampleWorkers.add(Worker.builder()
-//            .ip("")
-//            .port(9090)
-//            .ramseyNum(325)
-//            .build());
-//
-//    counterExampleWorkers.add(Worker.builder()
-//            .ip("")
-//            .port(9090)
-//            .ramseyNum(325)
-//            .build());
-//
-//    counterExampleWorkers.add(Worker.builder()
-//            .ip("")
-//            .port(9090)
-//            .ramseyNum(325)
-//            .build());
-//
-//    counterExampleWorkers.add(Worker.builder()
-//            .ip("")
-//            .port(9090)
-//            .ramseyNum(325)
-//            .build());
-
-    advanceWorkers.add(Worker.builder()
             .ip("18.232.91.179")
             .port(9090)
             .ramseyNum(325)
             .build());
+
+//    counterExampleWorkers.add(Worker.builder()
+//            .ip("")
+//            .port(9090)
+//            .ramseyNum(325)
+//            .build());
+//
+//    counterExampleWorkers.add(Worker.builder()
+//            .ip("")
+//            .port(9090)
+//            .ramseyNum(325)
+//            .build());
+//
+//    counterExampleWorkers.add(Worker.builder()
+//            .ip("")
+//            .port(9090)
+//            .ramseyNum(325)
+//            .build());
+//
+//    counterExampleWorkers.add(Worker.builder()
+//            .ip("")
+//            .port(9090)
+//            .ramseyNum(325)
+//            .build());
+//
+//    counterExampleWorkers.add(Worker.builder()
+//            .ip("")
+//            .port(9090)
+//            .ramseyNum(325)
+//            .build());
+//
+//    counterExampleWorkers.add(Worker.builder()
+//            .ip("")
+//            .port(9090)
+//            .ramseyNum(325)
+//            .build());
+//
+//    counterExampleWorkers.add(Worker.builder()
+//            .ip("")
+//            .port(9090)
+//            .ramseyNum(325)
+//            .build());
+//
+//    counterExampleWorkers.add(Worker.builder()
+//            .ip("")
+//            .port(9090)
+//            .ramseyNum(325)
+//            .build());
+
+//    advanceWorkers.add(Worker.builder()
+//            .ip("18.232.91.179")
+//            .port(9090)
+//            .ramseyNum(325)
+//            .build());
 
 //    advanceWorkers.add(Worker.builder()
 //            .ip("")
