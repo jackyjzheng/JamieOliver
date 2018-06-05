@@ -14,13 +14,6 @@ public class RamseyApi {
   private static final S3Manager s3Manager = new S3Manager();
   private static WorkerManager workerManager = new WorkerManager(325, 325);
 
-//  @RequestMapping("/test")
-//  public Server server(@RequestParam(value="name", defaultValue="World") String name) {
-//    return new Server(counter.incrementAndGet(),
-//            String.format(template, name));
-//  }
-
-
   @RequestMapping(value="/", method = RequestMethod.GET)
   public String printDefaultMessage() {
     return DEFAULT_MESSAGE;
