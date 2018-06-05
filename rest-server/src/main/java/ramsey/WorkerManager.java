@@ -25,7 +25,7 @@ public class WorkerManager {
     graphMap = new HashMap<>();
     this.counterExampleNum = counterExampleNum;
     this.advanceNum = advanceNum;
-    initializeGraphs();
+    //initializeGraphs();
   }
 
   private void initializeWorkersList(int ramseyNum) {
