@@ -9,7 +9,6 @@
 #include "CliqueCount.c"
 #include "CliqueCountOG.c"
 
-// Compile with g++ -std=c++11 -o cyclic cyclic.cpp
 struct TabuList {
 	TabuList(int maxTabuSize)
 	{
