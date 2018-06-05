@@ -79,7 +79,8 @@ int main(int argc, char **argv) {
 		/*---accept a connection (creating a data pipe)---*/
 		clientfd = accept(sockfd, (struct sockaddr*) &client_addr, (socklen_t*) &addrlen);
 		printf("%s:%d connected\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
-		printf("==============================RECEIVED CONNECTION===============================\n");
+		printf("==============RECEIVED INFORMATION FROM SOCKET================\n");
+
 		// FORMAT: NEW325, 27.
 		ssize_t data_sent = recv(clientfd, buffer, MAXBUF, 0);
 		int counter = 0;
@@ -117,7 +118,7 @@ int main(int argc, char **argv) {
 		sscanf(rNumString, "%d", &rNum);
 		sscanf(tabuSizeString, "%d", &tabuSize);
 		
-		printf("======================PROCESSED INFORMATION===================================\n");
+		printf("==============INFORMATION FROM SOCKET================\n");
 		printf("rNum is %i.\n", rNum);
 		printf("tabuSize is %i.\n", tabuSize);
 		printf("Amount of data sent: %zu.\n", data_sent);

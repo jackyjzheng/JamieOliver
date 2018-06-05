@@ -25,81 +25,69 @@ public class WorkerManager {
     graphMap = new HashMap<>();
     this.counterExampleNum = counterExampleNum;
     this.advanceNum = advanceNum;
-    initializeGraphs();
+    initializeWorkersList(325);
   }
 
   private void initializeWorkersList(int ramseyNum) {
     counterExampleWorkers.add(Worker.builder()
-            .ip("")
+            .ip("34.235.152.153")
+            .port(9090)
+            .ramseyNum(ramseyNum)
+            .build());
+
+    counterExampleWorkers.add(Worker.builder()
+            .ip("18.204.245.243")
             .port(9090)
             .ramseyNum(325)
             .build());
 
     counterExampleWorkers.add(Worker.builder()
-            .ip("")
+            .ip("34.228.196.116")
             .port(9090)
             .ramseyNum(325)
             .build());
 
     counterExampleWorkers.add(Worker.builder()
-            .ip("")
+            .ip("52.23.250.133")
             .port(9090)
             .ramseyNum(325)
             .build());
 
     counterExampleWorkers.add(Worker.builder()
-            .ip("")
+            .ip("54.208.204.102")
             .port(9090)
             .ramseyNum(325)
             .build());
 
     counterExampleWorkers.add(Worker.builder()
-            .ip("")
+            .ip("54.82.246.180")
             .port(9090)
             .ramseyNum(325)
             .build());
 
     counterExampleWorkers.add(Worker.builder()
-            .ip("")
+            .ip("34.201.6.179")
             .port(9090)
             .ramseyNum(325)
             .build());
 
     counterExampleWorkers.add(Worker.builder()
-            .ip("")
-            .port(9090)
-            .ramseyNum(325)
-            .build());
-
-    counterExampleWorkers.add(Worker.builder()
-            .ip("")
-            .port(9090)
-            .ramseyNum(325)
-            .build());
-
-    counterExampleWorkers.add(Worker.builder()
-            .ip("")
+            .ip("18.205.7.217")
             .port(9090)
             .ramseyNum(325)
             .build());
 
     advanceWorkers.add(Worker.builder()
-            .ip("")
+            .ip("18.232.91.179")
             .port(9090)
             .ramseyNum(325)
             .build());
 
     advanceWorkers.add(Worker.builder()
-            .ip("")
+            .ip("18.206.171.173")
             .port(9090)
             .ramseyNum(325)
             .build());
-  }
-
-  private void initializeWorkerJobs(int initalRamseyNum) {
-    for (Worker worker : counterExampleWorkers) {
-
-    }
   }
 
   public void incrementCounterExample(String graphString) {
@@ -139,16 +127,6 @@ public class WorkerManager {
   }
 
   /**
-   * Initialize the graphs from s3 into memory
-   */
-  private void initializeGraphs() {
-    List<String> graphList = s3Manager.getGraphList("");
-    for (String graphKey : graphList) {
-      addGraph(graphKey);
-    }
-  }
-
-  /**
    * If the subdirectory size is greater than a certain threshold, then workers will be put onto running on those
    * counter examples by updating workersMap
    */
@@ -157,15 +135,20 @@ public class WorkerManager {
     String prefix = graphKey.split("/")[0];
     // Check if enough counter examples for that subdirectory to move workers
     if (s3Manager.getSubdirectorySize(prefix) > COUNTER_EXAMPLE_THRESHOLD) {
-
+      System.out.println("REACHED THE THRESHOLD");
+      sendIncrementRamsey(prefix);
     }
   }
 
   /**
    * Once one of the 8 nodes reaches the threshold for graphs, all 8 become a counterexample worker for currRamseyNumber + 2
    */
-  public void sendIncrementRamsey() {
-
+  public void sendIncrementRamsey(String prefix) {
+    for (Worker worker : counterExampleWorkers) {
+      int newNum = Integer.parseInt(prefix);
+      newNum += 2;
+      sendMessage(worker, "NEW" + Integer.toString(newNum) + ", " + Integer.toString(newNum/10));
+    }
   }
 
   /**
@@ -173,6 +156,7 @@ public class WorkerManager {
    */
   public void sendMessage(Worker worker, String message) {
     try {
+      System.out.println("Sending message to " + worker.getIp() + " with message " + message);
       Socket socket = new Socket(worker.getIp(), worker.getPort());
       DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 
