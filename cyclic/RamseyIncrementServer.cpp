@@ -6,13 +6,13 @@
 #include <errno.h>
 #include <cstdlib>
 #include <unistd.h>
-#include "SearchManager.cpp"
+#include "Manager.cpp"
 
 #define MY_PORT		2049
 #define MAXBUF		1024
 
-void IncrementThread(IncrementManager *increment) {
-	Increment->init_increment();
+void IncrementThread(IncrementManager *increment, int *color) {
+	increment->init_increment(color);
 	return;
 }
 
@@ -50,21 +50,18 @@ int start_server() {
 
 
 int main(int argc, char **argv) {
-	if (argc != 3) {
-		printf("./listener ramseyNumber, tabuSize\n");
-		return -1;
-	}
-
 	// Bind server to port
 	int sockfd = start_server();
 
 	// Initialize search in another thread
-	int rNum = atoi(argv[1]);
-	int tabuSize = atoi(argv[2]);
+	IncrementManager *increment = NULL;
+	std::thread incrementThread;
+
+	bool firstIteration = true;
 
 	// Char buffer to hold new input
 	char buffer[MAXBUF];
-		
+
 	while (1) {	
 		int clientfd;
 		struct sockaddr_in client_addr;
@@ -76,23 +73,30 @@ int main(int argc, char **argv) {
 
 		/*---Echo back anything sent---*/
 		ssize_t data_sent = recv(clientfd, buffer, MAXBUF, 0);
-		int *new_colors = new int[data_sent-9];
-		for (int i = 5; i < data_sent-4; ++i) {
-			new_colors[i-5] = (int) buffer[i];
+		int *new_colors = new int[data_sent];
+		for (int i = 0; i < data_sent; ++i) {
+			new_colors[i] = (int) (buffer[i] - '0');
+		}
+		for(int i = 0; i < data_sent; ++i)
+			printf("%i", new_colors[i]);
+		int rNum = data_sent/2;
+		int tabuSize = rNum/10;
+		
+		if (firstIteration) {
+			increment = new IncrementManager(rNum, tabuSize);
+			incrementThread = std::thread(IncrementThread, increment, new_colors);
+			firstIteration = false;
+		} else {
+			increment->reinitialize(rNum, tabuSize, new_colors);	
+			increment->end_increment();
 		}
 		
-		printf("Amount of data sent: %zu.\n", data_sent);
-		search->reinitialize(rNum, tabuSize, 4);	
-		search->end_search();
-
-		//send(clientfd, buffer, recv(clientfd, buffer, MAXBUF, 0), 0);
-
 		/*---Close data connection---*/
 		close(clientfd);
 	}
 
 	/*---Clean up (should never get here!)---*/
-	searchThread.join();
+	incrementThread.join();
 	close(sockfd);
 	return 0;
 }

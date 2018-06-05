@@ -18,9 +18,9 @@ class UploadFileToServer(FileSystemEventHandler):
        		print(r)
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(('localhost', 2048))
+client.connect(('localhost', 2049))
 #print client.send('Hello world!'), 'bytes sent.'
-print client.send('250, 25'), 'bytes sent.'
+print client.send('0101010101010101010101010101010101010101010101010101010101010101010101'), 'bytes sent.'
 time.sleep(0.2)
 print 'Received message:', client.recv(1024)
 
