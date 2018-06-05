@@ -34,7 +34,18 @@ public class RamseyApi {
   public GraphResponse uploadGraph(@RequestBody GraphRequest req) {
     UUID uuid = UUID.randomUUID();
     String graphKey = req.getGraphName() + "/" + uuid;
-    boolean success = s3Manager.uploadGraph(req, uuid);
+    boolean success = s3Manager.uploadGraph(req, uuid, "search");
+    workerManager.addGraph(graphKey);
+    return GraphResponse.builder()
+            .success(success)
+            .build();
+  }
+
+  @RequestMapping(value="/incrementGraph", method=RequestMethod.POST, consumes="application/json")
+  public GraphResponse incrementGraph(@RequestBody GraphRequest req) {
+    UUID uuid = UUID.randomUUID();
+    String graphKey = req.getGraphName() + "/" + uuid;
+    boolean success = s3Manager.uploadGraph(req, uuid, "increment");
     workerManager.addGraph(graphKey);
     return GraphResponse.builder()
             .success(success)
@@ -53,9 +64,13 @@ public class RamseyApi {
     workerManager.setAdvanceNum(incRamseyNum);
   }
 
-  @RequestMapping(value="requestGraph", method=RequestMethod.GET)
+  @RequestMapping(value="/requestGraph", method=RequestMethod.GET)
   public String requestGraph(@RequestParam(value="ramseyNum") int ramseyNum) {
     return workerManager.serveGraphRequest(ramseyNum);
   }
 
+  @RequestMapping(value="/getBucketSize", method=RequestMethod.GET)
+  public int getBucketSize(@RequestParam(value="size") String ramseyNum) {
+    return s3Manager.getSubdirectorySize(ramseyNum);
+  }
 }

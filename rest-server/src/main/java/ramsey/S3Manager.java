@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public class S3Manager {
   private static final String BUCKET_NAME_INCREMENT = "ramsey-graphs-increment";
-  private static final String BUCKET_NAME_GENERATE = "ramsey-graphs-generate";
+  private static final String BUCKET_NAME_SEARCH = "ramsey-graphs-search";
   private AmazonS3 s3Client;
 
   public S3Manager() {
@@ -24,9 +24,15 @@ public class S3Manager {
             .build();
   }
 
-  public boolean uploadGraph(GraphRequest graphRequest, UUID uuid) {
+  public boolean uploadGraph(GraphRequest graphRequest, UUID uuid, String option) {
+    String bucketName;
+    if (option.equals("increment")) {
+      bucketName = BUCKET_NAME_INCREMENT;
+    } else {
+      bucketName = BUCKET_NAME_SEARCH;
+    }
     try {
-      s3Client.putObject(BUCKET_NAME_INCREMENT, graphRequest.getGraphName() + "/" + uuid, graphRequest.getGraphString());
+      s3Client.putObject(bucketName, graphRequest.getGraphName() + "/" + uuid, graphRequest.getGraphString());
     } catch (AmazonServiceException e) {
       System.err.println(e.getErrorMessage());
       return false;
@@ -35,7 +41,7 @@ public class S3Manager {
   }
 
   public String getGraph(String graphKey) {
-    S3Object object = s3Client.getObject(new GetObjectRequest(BUCKET_NAME_INCREMENT, graphKey));
+    S3Object object = s3Client.getObject(new GetObjectRequest(BUCKET_NAME_SEARCH, graphKey));
     InputStream objectData = object.getObjectContent();
     ByteArrayOutputStream result = new ByteArrayOutputStream();
     byte[] buffer = new byte[1024];
@@ -62,7 +68,7 @@ public class S3Manager {
    */
   public List<String> getGraphList(String prefix) {
     List<String> graphList = new ArrayList<String>();
-    ObjectListing listing = s3Client.listObjects(BUCKET_NAME_INCREMENT, prefix);
+    ObjectListing listing = s3Client.listObjects(BUCKET_NAME_SEARCH, prefix);
     List<S3ObjectSummary> summaries = listing.getObjectSummaries();
 
     while (listing.isTruncated()) {
@@ -81,7 +87,7 @@ public class S3Manager {
    * Example is giving a prefix of "200" and will return the number of files under that directory
    */
   public int getSubdirectorySize(String prefix) {
-    ObjectListing listing = s3Client.listObjects(BUCKET_NAME_INCREMENT, prefix );
+    ObjectListing listing = s3Client.listObjects(BUCKET_NAME_SEARCH, prefix );
     List<S3ObjectSummary> summaries = listing.getObjectSummaries();
     return summaries.size();
   }
@@ -91,7 +97,7 @@ public class S3Manager {
    */
   public void moveFolders(String graphKey, String newDirectory) {
     try {
-      s3Client.copyObject(BUCKET_NAME_INCREMENT, graphKey, BUCKET_NAME_INCREMENT, newDirectory + graphKey);
+      s3Client.copyObject(BUCKET_NAME_INCREMENT, graphKey, BUCKET_NAME_SEARCH, newDirectory + graphKey);
       s3Client.deleteObject(BUCKET_NAME_INCREMENT, graphKey);
     } catch (AmazonServiceException e) {
       System.err.println(e.getErrorMessage());

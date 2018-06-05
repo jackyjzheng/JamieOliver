@@ -35,53 +35,53 @@ public class WorkerManager {
             .ramseyNum(325)
             .build());
 
-    counterExampleWorkers.add(Worker.builder()
-            .ip("")
-            .port(9090)
-            .ramseyNum(325)
-            .build());
-
-    counterExampleWorkers.add(Worker.builder()
-            .ip("")
-            .port(9090)
-            .ramseyNum(325)
-            .build());
-
-    counterExampleWorkers.add(Worker.builder()
-            .ip("")
-            .port(9090)
-            .ramseyNum(325)
-            .build());
-
-    counterExampleWorkers.add(Worker.builder()
-            .ip("")
-            .port(9090)
-            .ramseyNum(325)
-            .build());
-
-    counterExampleWorkers.add(Worker.builder()
-            .ip("")
-            .port(9090)
-            .ramseyNum(325)
-            .build());
-
-    counterExampleWorkers.add(Worker.builder()
-            .ip("")
-            .port(9090)
-            .ramseyNum(325)
-            .build());
-
-    counterExampleWorkers.add(Worker.builder()
-            .ip("")
-            .port(9090)
-            .ramseyNum(325)
-            .build());
-
-    counterExampleWorkers.add(Worker.builder()
-            .ip("")
-            .port(9090)
-            .ramseyNum(325)
-            .build());
+//    counterExampleWorkers.add(Worker.builder()
+//            .ip("")
+//            .port(9090)
+//            .ramseyNum(325)
+//            .build());
+//
+//    counterExampleWorkers.add(Worker.builder()
+//            .ip("")
+//            .port(9090)
+//            .ramseyNum(325)
+//            .build());
+//
+//    counterExampleWorkers.add(Worker.builder()
+//            .ip("")
+//            .port(9090)
+//            .ramseyNum(325)
+//            .build());
+//
+//    counterExampleWorkers.add(Worker.builder()
+//            .ip("")
+//            .port(9090)
+//            .ramseyNum(325)
+//            .build());
+//
+//    counterExampleWorkers.add(Worker.builder()
+//            .ip("")
+//            .port(9090)
+//            .ramseyNum(325)
+//            .build());
+//
+//    counterExampleWorkers.add(Worker.builder()
+//            .ip("")
+//            .port(9090)
+//            .ramseyNum(325)
+//            .build());
+//
+//    counterExampleWorkers.add(Worker.builder()
+//            .ip("")
+//            .port(9090)
+//            .ramseyNum(325)
+//            .build());
+//
+//    counterExampleWorkers.add(Worker.builder()
+//            .ip("")
+//            .port(9090)
+//            .ramseyNum(325)
+//            .build());
 
     advanceWorkers.add(Worker.builder()
             .ip("18.232.91.179")
@@ -89,11 +89,11 @@ public class WorkerManager {
             .ramseyNum(325)
             .build());
 
-    advanceWorkers.add(Worker.builder()
-            .ip("")
-            .port(9090)
-            .ramseyNum(325)
-            .build());
+//    advanceWorkers.add(Worker.builder()
+//            .ip("")
+//            .port(9090)
+//            .ramseyNum(325)
+//            .build());
   }
 
   private void initializeWorkerJobs(int initalRamseyNum) {
@@ -157,7 +157,11 @@ public class WorkerManager {
     String prefix = graphKey.split("/")[0];
     // Check if enough counter examples for that subdirectory to move workers
     if (s3Manager.getSubdirectorySize(prefix) > COUNTER_EXAMPLE_THRESHOLD) {
-
+      for (Worker worker : counterExampleWorkers) {
+        int newNum = Integer.parseInt(prefix);
+        newNum += 2;
+        sendMessage(worker, "NEW" + Integer.toString(newNum) + ", " + Integer.toString(newNum/10));
+      }
     }
   }
 
