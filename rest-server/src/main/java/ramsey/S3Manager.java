@@ -33,8 +33,8 @@ public class S3Manager {
     return true;
   }
 
-  public String getGraph(String graphFilename) {
-    S3Object object = s3Client.getObject(new GetObjectRequest(BUCKET_NAME, graphFilename));
+  public String getGraph(String graphKey) {
+    S3Object object = s3Client.getObject(new GetObjectRequest(BUCKET_NAME, graphKey));
     InputStream objectData = object.getObjectContent();
     ByteArrayOutputStream result = new ByteArrayOutputStream();
     byte[] buffer = new byte[1024];
@@ -56,9 +56,12 @@ public class S3Manager {
     }
   }
 
-  public List<String> getGraphList() {
+  /**
+   * Returns all the names of the graph files under a certain prefix
+   */
+  public List<String> getGraphList(String prefix) {
     List<String> graphList = new ArrayList<String>();
-    ObjectListing listing = s3Client.listObjects(BUCKET_NAME);
+    ObjectListing listing = s3Client.listObjects(BUCKET_NAME, prefix);
     List<S3ObjectSummary> summaries = listing.getObjectSummaries();
 
     while (listing.isTruncated()) {
@@ -67,14 +70,30 @@ public class S3Manager {
     }
 
     for (S3ObjectSummary item : summaries) {
-      graphList.add(item.getKey());
+      if (!item.getKey().contains("old"))
+        graphList.add(item.getKey());
     }
     return graphList;
   }
 
+  /**
+   * Example is giving a prefix of "200" and will return the number of files under that directory
+   */
   public int getSubdirectorySize(String prefix) {
     ObjectListing listing = s3Client.listObjects( BUCKET_NAME, prefix );
     List<S3ObjectSummary> summaries = listing.getObjectSummaries();
     return summaries.size();
+  }
+
+  /**
+   * newDirectory must include the "/" character
+   */
+  public void moveFolders(String graphKey, String newDirectory) {
+    try {
+      s3Client.copyObject(BUCKET_NAME, graphKey, BUCKET_NAME, newDirectory + graphKey);
+      s3Client.deleteObject(BUCKET_NAME, graphKey);
+    } catch (AmazonServiceException e) {
+      System.err.println(e.getErrorMessage());
+    }
   }
 }

@@ -1,20 +1,20 @@
 package ramsey;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import pojos.GraphRequest;
 import pojos.GraphResponse;
 
-
+import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 public class RamseyApi {
 
   private static final String DEFAULT_MESSAGE = "Service is running";
   private static final S3Manager s3Manager = new S3Manager();
-  private static AtomicLong currRamseyNum = new AtomicLong();
-  private static WorkerManager workerManager = new WorkerManager();
+  private static WorkerManager workerManager = new WorkerManager(325, 325);
 
 //  @RequestMapping("/test")
 //  public Server server(@RequestParam(value="name", defaultValue="World") String name) {
@@ -26,6 +26,10 @@ public class RamseyApi {
   @RequestMapping(value="/", method = RequestMethod.GET)
   public String printDefaultMessage() {
     return DEFAULT_MESSAGE;
+  }
+
+  @RequestMapping(value="/test", method = RequestMethod.GET)
+  public void test() {
   }
 
   @RequestMapping(value="/uploadGraph", method=RequestMethod.POST, consumes="application/json")
@@ -44,10 +48,16 @@ public class RamseyApi {
     return s3Manager.getGraph(graphFilename);
   }
 
-  @RequestMapping(value="/updateRamsey", method=RequestMethod.GET)
-  public String updateRamseyNum(@RequestParam(value="ramseyNum") String incRamseyNumString) {
-    Long incRamseyNum = Long.parseLong(incRamseyNumString);
-    currRamseyNum.set(incRamseyNum);
-    return currRamseyNum.toString();
+  // Maybe don't need since worker manager handles the updating?
+  @RequestMapping(value="/updateAdvanceNum", method=RequestMethod.GET)
+  public void updateRamseyNum(@RequestParam(value="advanceNum") String incRamseyNumString) {
+    int incRamseyNum = Integer.parseInt(incRamseyNumString);
+    workerManager.setAdvanceNum(incRamseyNum);
   }
+
+  @RequestMapping(value="requestGraph", method=RequestMethod.GET)
+  public String requestGraph(@RequestParam(value="ramseyNum") int ramseyNum) {
+    return workerManager.serveGraphRequest(ramseyNum);
+  }
+
 }
