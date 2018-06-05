@@ -30,7 +30,7 @@ public class WorkerManager {
 
   private void initializeWorkersList(int ramseyNum) {
     counterExampleWorkers.add(Worker.builder()
-            .ip("")
+            .ip("54.174.198.245")
             .port(9090)
             .ramseyNum(325)
             .build());
@@ -84,7 +84,7 @@ public class WorkerManager {
             .build());
 
     advanceWorkers.add(Worker.builder()
-            .ip("")
+            .ip("18.232.91.179")
             .port(9090)
             .ramseyNum(325)
             .build());

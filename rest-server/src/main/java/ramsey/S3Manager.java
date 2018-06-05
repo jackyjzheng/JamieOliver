@@ -20,7 +20,7 @@ public class S3Manager {
   public S3Manager() {
     s3Client = AmazonS3ClientBuilder.standard()
             .withCredentials(new EnvironmentVariableCredentialsProvider())
-            .withRegion("us-west-1")
+            .withRegion("us-east-1")
             .build();
   }
 
