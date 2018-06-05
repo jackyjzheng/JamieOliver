@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <fstream>
 #include <thread>
+#include <uuid/uuid.h>
+#include <sys/stat.h>
 #include "CliqueCount.c"
 
 struct TabuList {
@@ -49,6 +51,8 @@ private:
 	TabuList *tabu_list;
 	int gSize;
 	int rNum;
+	const std::string search_dir = "GeneratedGraphs/";
+	const std::string increment_dir = "IncrementedGraphs/";
 
 public:
 	/*
@@ -118,6 +122,7 @@ public:
 			if (iterations != -1 && moves > iterations) {
 				running = false;
 				lowestClique = pick_new_color();
+				continue;
 			}
 			
 			moves += 1;
@@ -132,9 +137,13 @@ public:
 			}
 			else if (lowestClique == 0)
 			{	
-				std::string fileName = std::to_string(this->rNum) + ".txt"; 
-				//this->write_adj_graph(fileName.c_str());
-				this->write_color_graph(fileName.c_str());
+				//std::string directory = (search_dir + std::to_string(this->rNum));
+				uuid_t id;
+  				uuid_generate(id);
+  				char *uuid_str = new char[37];
+  				uuid_unparse(id, uuid_str);
+				std::string file_name = search_dir + std::to_string(this->rNum) + "__" + std::string(uuid_str) + ".txt";
+				this->write_color_graph(file_name.c_str());
 				return;
 			}
 		}
@@ -269,6 +278,10 @@ public:
 		}	
 	}
 
+	int getCliqueCount() {
+		return CliqueCount(this->adjGraph, this->rNum);
+	}
+
 	int get_adj_index(int gIndex) {
 		int row = 1;
 		int counter = 0;
@@ -377,36 +390,4 @@ int* read_color_graph(const char *file_name) {
 		}
 		printf("\n");
 		return color_graph;
-}
-
-int main(int argc, char **argv) {
-	if (argc != 3) {
-		printf("./cyclic ramsey_number tabu_size\n");
-		return 0;
-	}
-	
-	int rNum = atoi(argv[1]);
-	int tabuSize = atoi(argv[2]);
-	
-	while (true) {
-		RGraph *rGraph = new RGraph(rNum, tabuSize);
-		rGraph->tabu_search();
-	}
-
-
-	/* For incrementing from known graph
-	int *colors = read_adj_graph("329.txt");
-	RGraph *rGraph = new RGraph(rNum, tabuSize, colors);
-	while (true) {
-		rGraph->incrementNumber(2);
-		rGraph->tabu_search();
-	}*/
-	/*int numThreads = 4;
-	std::vector<std::thread> thread_pool;
-	thread_pool.reserve(numThreads);
-	for (int i = 0; i < numThreads; ++i) {
-		thread_pool.push_back(std::thread(tabu_loop_thread, rNum, tabuSize));
-	}*/
-	
-	return 0;
 }
