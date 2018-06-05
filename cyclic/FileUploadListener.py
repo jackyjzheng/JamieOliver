@@ -13,7 +13,7 @@ class UploadSearchFileToServer(FileSystemEventHandler):
        		json_data = {"graphName": file_name, "graphString": file_content}
        		print(json_data)
        		header = {'Content-type': 'application/json'}
-       		#r = requests.post('http://13.57.17.226:8080/uploadGraph', data = json.dumps(json_data), headers = header)
+       		r = requests.post('http://34.201.106.13:8080/uploadGraph', data = json.dumps(json_data), headers = header)
 
 class UploadIncrementFileToServer(FileSystemEventHandler):
     def on_created(self, event):
@@ -24,7 +24,7 @@ class UploadIncrementFileToServer(FileSystemEventHandler):
        		json_data = {"graphName": file_name, "graphString": file_content}
        		print(json_data)
        		header = {'Content-type': 'application/json'}
-       		#r = requests.post('http://13.57.17.226:8080/uploadGraph', data = json.dumps(json_data), headers = header)
+       		r = requests.post('http://34.201.106.13:8080/incrementGraph', data = json.dumps(json_data), headers = header)
 
 observer = Observer()
 event_handler_search = UploadSearchFileToServer() # create event handler

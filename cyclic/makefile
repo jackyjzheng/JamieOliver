@@ -1,4 +1,4 @@
-CPPFLAGS=-pthread 
+CPPFLAGS=-std=c++11 -pthread 
 LDLIBS=-luuid
 
 default: RamseyIncrementServer RamseySearchServer
