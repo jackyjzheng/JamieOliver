@@ -7,6 +7,7 @@
 #include <uuid/uuid.h>
 #include <sys/stat.h>
 #include "CliqueCount.c"
+#include "CliqueCountOG.c"
 
 // Compile with g++ -std=c++11 -o cyclic cyclic.cpp
 struct TabuList {
@@ -53,6 +54,7 @@ private:
 	TabuList *tabu_list;
 	int gSize;
 	int rNum;
+	bool isIncrement = false;
 	const std::string search_dir = "GeneratedGraphs/";
 	const std::string increment_dir = "IncrementedGraphs/";
 
@@ -144,7 +146,13 @@ public:
   				uuid_generate(id);
   				char *uuid_str = new char[37];
   				uuid_unparse(id, uuid_str);
-				std::string file_name = search_dir + std::to_string(this->rNum) + "__" + std::string(uuid_str) + ".txt";
+  				
+  				std::string file_name;
+  				if (!this->isIncrement)
+					file_name = search_dir + std::to_string(this->rNum) + "__" + std::string(uuid_str) + ".txt";
+				else
+					file_name = increment_dir + std::to_string(this->rNum) + "__" + std::string(uuid_str) + ".txt";
+
 				this->write_color_graph(file_name.c_str());
 				return;
 			}
@@ -199,6 +207,7 @@ public:
 	// Increment in multiples of 2 to make sure we are adding a new color
 	void incrementNumber(int count) {
 		printf("CliqueCount before increment is %i.\n", CliqueCount(this->adjGraph, this->rNum));
+		this->isIncrement = true;
 
 		int old_r_num = this->rNum;
 		this->rNum += 2*count;
@@ -315,8 +324,9 @@ public:
 		outFile << r_num << std::endl;
 		
 		int adj_size = (r_num) * (r_num);
-		for (int i = 0; i < adj_size; ++i)
-				outFile << (this->adjGraph)[i]; 
+		for (int i = 0; i < adj_size; ++i) {
+			outFile << (this->adjGraph)[i]; 
+		}
 	}	
 
 	void write_color_graph(const char *file_name) {
@@ -330,12 +340,6 @@ public:
 	}
 };
 
-void tabu_loop_thread(int rNum, int tabuSize) {
-	RGraph *search = new RGraph(rNum, tabuSize);
-	search->tabu_search();
-	//search->write_color_graph("colors_dir/color.txt");
-	//search->read_color_graph("colors_dir/color.txt");
-}
 int *read_adj_graph(const char *file_name) {
 	std::string rNum;
 	std::string graph;
@@ -392,36 +396,4 @@ int* read_color_graph(const char *file_name) {
 		}
 		printf("\n");
 		return color_graph;
-}
-
-int main(int argc, char **argv) {
-	if (argc != 3) {
-		printf("./cyclic ramsey_number tabu_size\n");
-		return 0;
-	}
-	
-	int rNum = atoi(argv[1]);
-	int tabuSize = atoi(argv[2]);
-	
-	while (true) {
-		RGraph *rGraph = new RGraph(rNum, tabuSize);
-		rGraph->tabu_search();
-	}
-
-
-	/* For incrementing from known graph
-	int *colors = read_adj_graph("329.txt");
-	RGraph *rGraph = new RGraph(rNum, tabuSize, colors);
-	while (true) {
-		rGraph->incrementNumber(2);
-		rGraph->tabu_search();
-	}*/
-	/*int numThreads = 4;
-	std::vector<std::thread> thread_pool;
-	thread_pool.reserve(numThreads);
-	for (int i = 0; i < numThreads; ++i) {
-		thread_pool.push_back(std::thread(tabu_loop_thread, rNum, tabuSize));
-	}*/
-	
-	return 0;
 }

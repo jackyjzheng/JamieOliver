@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include "cyclic.cpp"
+#include "RGraph.cpp"
 
 class SearchManager {
 private:
@@ -61,11 +61,15 @@ private:
 	int init_rNum;
 	int init_tabuSize;
 	std::thread increment; 
-	int *color;
+	int *color = NULL;
 	bool increment_running = false;
 	bool run_again = false;
 
 public:
+	void end_increment() {
+		this->increment_running = false;
+	}
+
 	void init_increment(int *color) {
 		this->color = color;
 		do {
@@ -93,7 +97,7 @@ public:
 		}
 	}
 
-	IncrementManager(int init_rNum, int tabuSize, int *color) {
+	IncrementManager(int init_rNum, int tabuSize) {
 		this->init_rNum = init_rNum;
 		this->init_tabuSize = tabuSize;
 	}

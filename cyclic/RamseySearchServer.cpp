@@ -6,7 +6,7 @@
 #include <errno.h>
 #include <cstdlib>
 #include <unistd.h>
-#include "SearchManager.cpp"
+#include "Manager.cpp"
 
 #define MY_PORT		2048
 #define MAXBUF		1024
@@ -66,8 +66,10 @@ int main(int argc, char **argv) {
 
 	// Char buffer to hold new input
 	char buffer[MAXBUF];
-	char rNumString[4];
-	char tabuSizeString[3];
+	char rNumString[100];
+	int rBufferSize = 0;
+	char tabuSizeString[100];
+	int tabuBufferSize = 0;
 	
 	while (1) {	
 		int clientfd;
@@ -78,16 +80,39 @@ int main(int argc, char **argv) {
 		clientfd = accept(sockfd, (struct sockaddr*) &client_addr, (socklen_t*) &addrlen);
 		printf("%s:%d connected\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
-		/*---Echo back anything sent---*/
+		// FORMAT: NEW325, 27.
 		ssize_t data_sent = recv(clientfd, buffer, MAXBUF, 0);
-		if (data_sent != 7)
-			close(clientfd);
-
-		for (int i = 0; i < 3; ++i)
-			rNumString[i] = buffer[i];
-		rNumString[3] = '\0';
-		for (int i = 0; i < 2; ++i)
-			tabuSizeString[i] = buffer[5 + i];
+		int counter = 0;
+		while (buffer[counter] != 'N') {
+			counter += 1;
+			if (counter > MAXBUF)
+				continue;
+		}
+		if (buffer[counter+1] == 'E' && buffer[counter+2] == 'W') {
+			int i = counter+3;
+			for (i; buffer[i] != ','; ++i) {
+				rNumString[i-(counter+3)] = buffer[i];
+				rBufferSize += 1;
+				if (rBufferSize >= 100)
+					break;
+			}
+			int next = i+2;
+			for (int i = next; buffer[i] != '.'; ++i) {
+				tabuSizeString[i-next] = buffer[i];
+				tabuBufferSize += 1;
+				if (tabuBufferSize >= 100)
+					break;
+			}	
+		} else {
+			continue;
+		}
+		
+		if (rBufferSize >= 100 || tabuBufferSize >= 100)
+			continue;
+		else {
+			rNumString[rBufferSize] = '\0';
+			tabuSizeString[tabuBufferSize] = '\0';
+		}
 
 		sscanf(rNumString, "%d", &rNum);
 		sscanf(tabuSizeString, "%d", &tabuSize);
