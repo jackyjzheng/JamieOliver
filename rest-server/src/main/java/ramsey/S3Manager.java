@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class S3Manager {
-  private static final String BUCKET_NAME = "ramsey-graphs";
+  private static final String BUCKET_NAME_INCREMENT = "ramsey-graphs-increment";
+  private static final String BUCKET_NAME_GENERATE = "ramsey-graphs-generate";
   private AmazonS3 s3Client;
 
   public S3Manager() {
@@ -25,7 +26,7 @@ public class S3Manager {
 
   public boolean uploadGraph(GraphRequest graphRequest, UUID uuid) {
     try {
-      s3Client.putObject(BUCKET_NAME, graphRequest.getGraphName() + "/" + uuid, graphRequest.getGraphString());
+      s3Client.putObject(BUCKET_NAME_INCREMENT, graphRequest.getGraphName() + "/" + uuid, graphRequest.getGraphString());
     } catch (AmazonServiceException e) {
       System.err.println(e.getErrorMessage());
       return false;
@@ -34,7 +35,7 @@ public class S3Manager {
   }
 
   public String getGraph(String graphKey) {
-    S3Object object = s3Client.getObject(new GetObjectRequest(BUCKET_NAME, graphKey));
+    S3Object object = s3Client.getObject(new GetObjectRequest(BUCKET_NAME_INCREMENT, graphKey));
     InputStream objectData = object.getObjectContent();
     ByteArrayOutputStream result = new ByteArrayOutputStream();
     byte[] buffer = new byte[1024];
@@ -61,7 +62,7 @@ public class S3Manager {
    */
   public List<String> getGraphList(String prefix) {
     List<String> graphList = new ArrayList<String>();
-    ObjectListing listing = s3Client.listObjects(BUCKET_NAME, prefix);
+    ObjectListing listing = s3Client.listObjects(BUCKET_NAME_INCREMENT, prefix);
     List<S3ObjectSummary> summaries = listing.getObjectSummaries();
 
     while (listing.isTruncated()) {
@@ -80,7 +81,7 @@ public class S3Manager {
    * Example is giving a prefix of "200" and will return the number of files under that directory
    */
   public int getSubdirectorySize(String prefix) {
-    ObjectListing listing = s3Client.listObjects( BUCKET_NAME, prefix );
+    ObjectListing listing = s3Client.listObjects(BUCKET_NAME_INCREMENT, prefix );
     List<S3ObjectSummary> summaries = listing.getObjectSummaries();
     return summaries.size();
   }
@@ -90,8 +91,8 @@ public class S3Manager {
    */
   public void moveFolders(String graphKey, String newDirectory) {
     try {
-      s3Client.copyObject(BUCKET_NAME, graphKey, BUCKET_NAME, newDirectory + graphKey);
-      s3Client.deleteObject(BUCKET_NAME, graphKey);
+      s3Client.copyObject(BUCKET_NAME_INCREMENT, graphKey, BUCKET_NAME_INCREMENT, newDirectory + graphKey);
+      s3Client.deleteObject(BUCKET_NAME_INCREMENT, graphKey);
     } catch (AmazonServiceException e) {
       System.err.println(e.getErrorMessage());
     }

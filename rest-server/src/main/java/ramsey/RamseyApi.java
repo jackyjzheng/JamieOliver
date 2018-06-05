@@ -1,12 +1,10 @@
 package ramsey;
 
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import pojos.GraphRequest;
 import pojos.GraphResponse;
 
-import javax.servlet.http.HttpServletRequest;
+
 import java.util.UUID;
 
 @RestController
