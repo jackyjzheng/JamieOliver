@@ -25,6 +25,7 @@ public class WorkerManager {
     graphMap = new HashMap<>();
     this.counterExampleNum = counterExampleNum;
     this.advanceNum = advanceNum;
+    initializeWorkersList(325);
     //initializeGraphs();
   }
 
@@ -32,7 +33,7 @@ public class WorkerManager {
     counterExampleWorkers.add(Worker.builder()
             .ip("18.232.91.179")
             .port(9090)
-            .ramseyNum(325)
+            .ramseyNum(ramseyNum)
             .build());
 
 //    counterExampleWorkers.add(Worker.builder()
