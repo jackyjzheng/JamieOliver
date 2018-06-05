@@ -5,6 +5,8 @@ from subprocess import call
 
 
 ec2 = boto3.resource('ec2', region_name="us-east-1")
+securityGroupId = 'sg-07aea7b9c198d6fbc'
+keyName = 'test'
 
 # For the web server
 print('Creating web server instance')
@@ -13,9 +15,9 @@ instance = ec2.create_instances(
     MinCount=1,
     MaxCount=1,
     SecurityGroupIds=[
-    	'sg-07aea7b9c198d6fbc'
+    	securityGroupId
     ],
-    KeyName='test',
+    KeyName=keyName,
     InstanceType='t2.micro',
     TagSpecifications=[
     	{
@@ -42,16 +44,16 @@ cmd = 'scp -i /Users/dennisfong/test.pem /Users/dennisfong/test.txt ' + 'ubuntu@
 call(cmd.split())
 
 # Worker 1
-print('Creating worker instance')
+print('Creating worker 1')
 instance = ec2.create_instances(
     ImageId='ami-a4dc46db',
     MinCount=1,
     MaxCount=1,
     SecurityGroupIds=[
-    	'sg-07aea7b9c198d6fbc'
+    	securityGroupId
     ],
-    KeyName='test',
-    InstanceType='t2.micro',
+    KeyName=keyName,
+    InstanceType='c5.large',
     TagSpecifications=[
     	{
     		'ResourceType': 'instance',
@@ -92,16 +94,16 @@ while image.state == 'pending':
 # snapshot.wait_until_completed()
 
 # Worker 2
-print('Creating worker instances 2-10')
+print('Creating worker 2')
 instanceList = ec2.create_instances(
     ImageId=imageId,
     MinCount=1,
-    MaxCount=9,
-    KeyName='test',
+    MaxCount=1,
+    KeyName=keyName,
     SecurityGroupIds=[
-    	'sg-07aea7b9c198d6fbc'
+    	securityGroupId
     ],
-    InstanceType='t2.micro',
+    InstanceType='c5.xlarge',
     TagSpecifications=[
     	{
     		'ResourceType': 'instance',
@@ -114,58 +116,186 @@ instanceList = ec2.create_instances(
     	}
   	])
 
-# # Worker 3
-# instance = ec2.create_instances(
-#     ImageId='ami-a4dc46db',
-#     MinCount=1,
-#     MaxCount=1,
-#     InstanceType='t2.micro')
+# Worker 3
+print('Creating worker 3')
+instanceList = ec2.create_instances(
+    ImageId=imageId,
+    MinCount=1,
+    MaxCount=1,
+    KeyName=keyName,
+    SecurityGroupIds=[
+    	securityGroupId
+    ],
+    InstanceType='c5.2xlarge',
+    TagSpecifications=[
+    	{
+    		'ResourceType': 'instance',
+    		'Tags': [
+	    		{
+	    			'Key': 'Name',
+	    			'Value' : 'worker3'
+	    		}
+    		]
+    	}
+  	])
 
-# # Worker 4
-# instance = ec2.create_instances(
-#     ImageId='ami-a4dc46db',
-#     MinCount=1,
-#     MaxCount=1,
-#     InstanceType='t2.micro')
+# Worker 4
+print('Creating worker 4')
+instanceList = ec2.create_instances(
+    ImageId=imageId,
+    MinCount=1,
+    MaxCount=1,
+    KeyName=keyName,
+    SecurityGroupIds=[
+    	securityGroupId
+    ],
+    InstanceType='c5.4xlarge',
+    TagSpecifications=[
+    	{
+    		'ResourceType': 'instance',
+    		'Tags': [
+	    		{
+	    			'Key': 'Name',
+	    			'Value' : 'worker4'
+	    		}
+    		]
+    	}
+  	])
 
-# # Worker 5
-# instance = ec2.create_instances(
-#     ImageId='ami-a4dc46db',
-#     MinCount=1,
-#     MaxCount=1,
-#     InstanceType='t2.micro')
+# Worker 5
+print('Creating worker 5')
+instanceList = ec2.create_instances(
+    ImageId=imageId,
+    MinCount=1,
+    MaxCount=1,
+    KeyName=keyName,
+    SecurityGroupIds=[
+    	securityGroupId
+    ],
+    InstanceType='c5.9xlarge',
+    TagSpecifications=[
+    	{
+    		'ResourceType': 'instance',
+    		'Tags': [
+	    		{
+	    			'Key': 'Name',
+	    			'Value' : 'worker5'
+	    		}
+    		]
+    	}
+  	])
 
-# # Worker 6
-# instance = ec2.create_instances(
-#     ImageId='ami-a4dc46db',
-#     MinCount=1,
-#     MaxCount=1,
-#     InstanceType='t2.micro')
+# Worker 6
+print('Creating worker 6')
+instanceList = ec2.create_instances(
+    ImageId=imageId,
+    MinCount=1,
+    MaxCount=1,
+    KeyName=keyName,
+    SecurityGroupIds=[
+    	securityGroupId
+    ],
+    InstanceType='c4.large',
+    TagSpecifications=[
+    	{
+    		'ResourceType': 'instance',
+    		'Tags': [
+	    		{
+	    			'Key': 'Name',
+	    			'Value' : 'worker6'
+	    		}
+    		]
+    	}
+  	])
 
-# # Worker 7
-# instance = ec2.create_instances(
-#     ImageId='ami-a4dc46db',
-#     MinCount=1,
-#     MaxCount=1,
-#     InstanceType='t2.micro')
+# Worker 7
+print('Creating worker 7')
+instanceList = ec2.create_instances(
+    ImageId=imageId,
+    MinCount=1,
+    MaxCount=1,
+    KeyName=keyName,
+    SecurityGroupIds=[
+    	securityGroupId
+    ],
+    InstanceType='c4.2xlarge',
+    TagSpecifications=[
+    	{
+    		'ResourceType': 'instance',
+    		'Tags': [
+	    		{
+	    			'Key': 'Name',
+	    			'Value' : 'worker7'
+	    		}
+    		]
+    	}
+  	])
 
-# # Worker 8
-# instance = ec2.create_instances(
-#     ImageId='ami-a4dc46db',
-#     MinCount=1,
-#     MaxCount=1,
-#     InstanceType='t2.micro')
+# Worker 8
+print('Creating worker 8')
+instanceList = ec2.create_instances(
+    ImageId=imageId,
+    MinCount=1,
+    MaxCount=1,
+    KeyName=keyName,
+    SecurityGroupIds=[
+    	securityGroupId
+    ],
+    InstanceType='c4.4xlarge',
+    TagSpecifications=[
+    	{
+    		'ResourceType': 'instance',
+    		'Tags': [
+	    		{
+	    			'Key': 'Name',
+	    			'Value' : 'worker8'
+	    		}
+    		]
+    	}
+  	])
 
-# # Worker 9
-# instance = ec2.create_instances(
-#     ImageId='ami-a4dc46db',
-#     MinCount=1,
-#     MaxCount=1,
-#     InstanceType='t2.micro')
+# Worker 9
+print('Creating worker 9')
+instanceList = ec2.create_instances(
+    ImageId=imageId,
+    MinCount=1,
+    MaxCount=1,
+    KeyName=keyName,
+    SecurityGroupIds=[
+    	securityGroupId
+    ],
+    InstanceType='c4.8xlarge',
+    TagSpecifications=[
+    	{
+    		'ResourceType': 'instance',
+    		'Tags': [
+	    		{
+	    			'Key': 'Name',
+	    			'Value' : 'worker9'
+	    		}
+    		]
+    	}
+  	])
 
-# # Worker 10
-# instance = ec2.create_instances(
-#     ImageId='ami-a4dc46db',
-#     MinCount=1,
-#     MaxCount=1,
-#     InstanceType='t2.micro')
+# Worker 10
+print('Creating worker 10')
+instanceList = ec2.create_instances(
+    ImageId=imageId,
+    MinCount=1,
+    MaxCount=1,
+    KeyName=keyName,
+    SecurityGroupIds=[
+    	securityGroupId
+    ],
+    InstanceType='c5d.large',
+    TagSpecifications=[
+    	{
+    		'ResourceType': 'instance',
+    		'Tags': [
+	    		{
+	    			'Key': 'Name',
+	    			'Value' : 'worker10'
+	    		}
+    		]
+    	}
+  	])
