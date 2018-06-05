@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <fstream>
 #include <thread>
+#include <uuid/uuid.h>
+#include <sys/stat.h>
 #include "CliqueCount.c"
 
 // Compile with g++ -std=c++11 -o cyclic cyclic.cpp
@@ -51,6 +53,8 @@ private:
 	TabuList *tabu_list;
 	int gSize;
 	int rNum;
+	const std::string search_dir = "GeneratedGraphs/";
+	const std::string increment_dir = "IncrementedGraphs/";
 
 public:
 	/*
@@ -120,6 +124,7 @@ public:
 			if (iterations != -1 && moves > iterations) {
 				running = false;
 				lowestClique = pick_new_color();
+				continue;
 			}
 			
 			moves += 1;
@@ -134,9 +139,13 @@ public:
 			}
 			else if (lowestClique == 0)
 			{	
-				std::string fileName = std::to_string(this->rNum) + ".txt"; 
-				//this->write_adj_graph(fileName.c_str());
-				this->write_color_graph(fileName.c_str());
+				//std::string directory = (search_dir + std::to_string(this->rNum));
+				uuid_t id;
+  				uuid_generate(id);
+  				char *uuid_str = new char[37];
+  				uuid_unparse(id, uuid_str);
+				std::string file_name = search_dir + std::to_string(this->rNum) + "__" + std::string(uuid_str) + ".txt";
+				this->write_color_graph(file_name.c_str());
 				return;
 			}
 		}
@@ -269,6 +278,10 @@ public:
 			}
 			row += 1;
 		}	
+	}
+
+	int getCliqueCount() {
+		return CliqueCount(this->adjGraph, this->rNum);
 	}
 
 	int get_adj_index(int gIndex) {
