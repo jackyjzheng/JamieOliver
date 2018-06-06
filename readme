@@ -1,0 +1,20 @@
+cyclic: Client side code, multi-threaded search and increment, and python listener to publish code to EC2 server.
+	checker.cpp: Test program to check Ramsey number from adjacency graph in file.
+	CliqueCount.c: Two modified CliqueCount for cyclic graphs, CliqueCountLimit exits early, when count hits certain number.
+	CliqueCountOG.c: Original unmodified CliqueCount to check my work.
+	FileUploadListener.py: Python script that listens for file writes in Generated/Incremented Graphs and uploads to REST server.
+	GeneratedGraphs/IncrementedGraphs: Directory to store graphs that encode color information.
+	Manager.cpp: Controls multithreaded operations on RGraphs.
+	RamseyIncrementServer.cpp: Listens for server communication and sends information to multithreaded mangers.
+	RamseySearchServer.cpp: Does the same thing but for search workers.
+	RGraph.cpp: Defines cyclic graphs and operations on Cyclic graphs.
+	
+rest-server: Java spring server to setup REST api and store State information.
+
+scripts: Scripts to handle cloud instances
+	ec2_manager.py: Deploys server instance to EC2 / loads the service jar file, creates worker instnce, makes an image of the instance, deploys the rest of workers with that imagae
+	run_workers.sh: Script to scp worker code and execute them in the background.
+	scriptToRun_increment.sh: Pushes code to start up increment workers.
+	scriptToRun.sh: Pushes code to start constantly searching workers.
+
+luus-jakola : First attempt at search algorithm, worked fairly well but hard to distribute and hit wall around 200s.
