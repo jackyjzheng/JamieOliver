@@ -38,8 +38,7 @@ currInstance.load()
 dnsName = currInstance.public_dns_name
 
 time.sleep(20)
-#cmd = 'scp -i /Users/dennisfong/test.pem /Users/dennisfong/Desktop/Projects/JamieOliver/rest-server/target/gs-rest-service-0.1.0.jar ' + 'ubuntu@' + dnsName + ':~'
-cmd = 'scp -i /Users/dennisfong/test.pem /Users/dennisfong/test.txt ' + 'ubuntu@' + dnsName + ':~'
+cmd = 'scp -i /Users/dennisfong/test.pem /Users/dennisfong/Desktop/Projects/JamieOliver/rest-server/target/gs-rest-service-0.1.0.jar ' + 'ubuntu@' + dnsName + ':~'
 
 call(cmd.split())
 
